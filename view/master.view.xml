@@ -2,7 +2,7 @@
 		  controllerName="sap.eni.basket.controller.master"
 		  xmlns="sap.m"
 		  xmlns:mvc="sap.ui.core.mvc">
-    <Page id="master" initialMaster="master" title="">  	      
+    <Page id="master" initialMaster="master" title="Basket(s)">  	      
    		<subHeader id="masterSubHeader">
 			<Bar id="searchBar">
 				<contentMiddle>
@@ -37,7 +37,7 @@
 		<footer>
 			<Bar>
 				<contentRight>
-					<Button	icon="sap-icon://filter" press="StatusFilter" />
+					<Button	id="butFilter" icon="sap-icon://filter" press="onFilter" />
 				</contentRight>
 			</Bar>
 		</footer>					

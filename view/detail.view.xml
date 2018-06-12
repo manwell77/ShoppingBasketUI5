@@ -4,7 +4,7 @@
 		  xmlns:mvc="sap.ui.core.mvc"
 		  xmlns:core="sap.ui.core"
 		  displayBlock="true">
-	<Page id="detailPage" title="" showNavButton="{= ${device>/system/desktop} ? false : true }" navButtonPress="onNavigationBack">	      
+	<Page id="detailPage" showNavButton="{= ${device>/system/desktop} ? false : true }" navButtonPress="onNavigationBack" title="Basket Detail">	      
 		<content>		    		    		    
 			<ObjectHeader id="scHeader"
 					      responsive="true"
