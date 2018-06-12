@@ -6,7 +6,7 @@
    		<subHeader id="masterSubHeader">
 			<Bar id="searchBar">
 				<contentMiddle>
-					<SearchField id="searchField" search="onSearch" width="100%" showRefreshButton="{= ${device>/support/touch} ? false : true }" />
+					<SearchField id="searchField" search="onLiveSearch" width="100%" showRefreshButton="{= ${device>/support/touch} ? false : true }" liveChange="onLiveSearch" />
 				</contentMiddle>
 			</Bar>
 		</subHeader>
