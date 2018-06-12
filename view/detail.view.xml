@@ -1,0 +1,54 @@
+<mvc:View id="detailView"
+          controllerName="sap.eni.basket.controller.detail" 
+		  xmlns="sap.m"
+		  xmlns:mvc="sap.ui.core.mvc"
+		  xmlns:core="sap.ui.core"
+		  displayBlock="true">
+	<Page id="detailPage" title="" showNavButton="{= ${device>/system/desktop} ? false : true }" navButtonPress="onNavigationBack">	      
+		<content>		    		    		    
+			<ObjectHeader id="scHeader"
+					      responsive="true"
+					      fullScreenOptimized="true"
+					      binding="{sc}"        	  
+						  title="{sc>BasketNumber}"
+						  icon="sap-icon://my-sales-order"
+						  intro="{sc>CreatedBy}"
+						  showMarkers="false"
+						  markFlagged="false"
+						  markFavorite="false"
+						  numberState="None"
+						  backgroundDesign="Translucent">
+					<statuses>
+						<ObjectStatus title="{sc>Status}" text="{sc>Status}"/>
+					</statuses>	
+				</ObjectHeader>		 
+				<List id="scItemList"
+				      width="auto" 
+				      items="{sc>ItemSet}" 
+					  growing="true"
+					  growingThreshold="10"
+					  growingScrollToLoad="true"
+					  busyIndicatorDelay="100"												  								      
+				      enableBusyIndicator="true">
+					<items>
+						<ObjectListItem title="{sc>Description}" 												                
+						                type="Inactive"
+						                number="{sc>Value}"
+							            numberUnit="{sc>Currency}">
+							<attributes>
+								<ObjectAttribute id="scUnit" text="{sc>Quantity} {sc>Unit}" />
+							</attributes>
+						</ObjectListItem>
+					</items>
+				</List>					   
+		</content>	
+		<footer>
+			<Bar>
+				<contentRight>
+				    <Button	icon="sap-icon://decline" press="onReject" type="Reject" text="Reject"/>
+					<Button	icon="sap-icon://accept" press="onApprove" type="Accept" text="Approve"/>
+				</contentRight>
+			</Bar>
+		</footer>			
+	</Page>
+</mvc:View>	

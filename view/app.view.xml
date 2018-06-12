@@ -1,0 +1,16 @@
+<mvc:View 
+    controllerName="sap.eni.basket.controller.app"
+  	xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true">
+   	<App class="appStyle" id="app">
+   	    <SplitContainer id="splitApp">
+   	    	<masterPages>    	        
+				<mvc:XMLView viewName="sap.eni.basket.view.master"/>
+			</masterPages>
+			<detailPages>
+			    <mvc:XMLView viewName="sap.eni.basket.view.detail"/>
+			</detailPages>
+		</SplitContainer>
+	</App>	
+</mvc:View> 

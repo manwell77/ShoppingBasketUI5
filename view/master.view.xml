@@ -1,0 +1,45 @@
+<mvc:View id="masterView"
+		  controllerName="sap.eni.basket.controller.master"
+		  xmlns="sap.m"
+		  xmlns:mvc="sap.ui.core.mvc">
+    <Page id="master" initialMaster="master" title="">  	      
+   		<subHeader id="masterSubHeader">
+			<Bar id="searchBar">
+				<contentMiddle>
+					<SearchField id="searchField" search="onSearch" width="100%" showRefreshButton="{= ${device>/support/touch} ? false : true }" />
+				</contentMiddle>
+			</Bar>
+		</subHeader>
+        <content>   
+		   <List id="masterList" 
+			     class="sapUiResponsiveMargin"
+			     width="auto"
+			     items="{path:'sc>/HeaderSet'}"
+				 growing="true"
+				 growingThreshold="10"
+				 growingScrollToLoad="true"
+				 busyIndicatorDelay="100"	     
+			     enableBusyIndicator="true"> 		      				     
+		      <items>
+		         <ObjectListItem title="{sc>BasketNumber}" 
+		                         type="Navigation" 		                         	                         
+		                         press="onScPressed">
+					<firstStatus>
+						<ObjectStatus text="{sc>Status}" />
+					</firstStatus>		                         
+       				<attributes>
+						<ObjectAttribute text="{sc>CreatedBy}" />											
+					</attributes>		                         
+		         </ObjectListItem>
+		      </items>
+		   </List>        
+		</content>
+		<footer>
+			<Bar>
+				<contentRight>
+					<Button	icon="sap-icon://filter" press="StatusFilter" />
+				</contentRight>
+			</Bar>
+		</footer>					
+	</Page>	   
+</mvc:View>
