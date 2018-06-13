@@ -169,6 +169,79 @@ protected section.
     raising
       /IWBEP/CX_MGW_BUSI_EXCEPTION
       /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods REQUESTERSET_CREATE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_C optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IO_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
+    exporting
+      !ER_ENTITY type ZCL_ZENISB_MPC=>TS_REQUESTER
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods REQUESTERSET_DELETE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_D optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods REQUESTERSET_GET_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_REQUEST_OBJECT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+    exporting
+      !ER_ENTITY type ZCL_ZENISB_MPC=>TS_REQUESTER
+      !ES_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods REQUESTERSET_GET_ENTITYSET
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_FILTER_SELECT_OPTIONS type /IWBEP/T_MGW_SELECT_OPTION
+      !IS_PAGING type /IWBEP/S_MGW_PAGING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IT_ORDER type /IWBEP/T_MGW_SORTING_ORDER
+      !IV_FILTER_STRING type STRING
+      !IV_SEARCH_STRING type STRING
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITYSET optional
+    exporting
+      !ET_ENTITYSET type ZCL_ZENISB_MPC=>TT_REQUESTER
+      !ES_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods REQUESTERSET_UPDATE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_U optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IO_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
+    exporting
+      !ER_ENTITY type ZCL_ZENISB_MPC=>TS_REQUESTER
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
 
   methods CHECK_SUBSCRIPTION_AUTHORITY
     redefinition .
@@ -197,7 +270,7 @@ CLASS ZCL_ZENISB_DPC IMPLEMENTATION.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~CREATE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_CRT_ENTITY_BASE
-*&* This class has been generated on 12.06.2018 14:58:53 in client 001
+*&* This class has been generated on 13.06.2018 11:00:24 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -206,6 +279,7 @@ method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~CREATE_ENTITY.
 
  DATA headerset_create_entity TYPE zcl_zenisb_mpc=>ts_header.
  DATA itemset_create_entity TYPE zcl_zenisb_mpc=>ts_item.
+ DATA requesterset_create_entity TYPE zcl_zenisb_mpc=>ts_requester.
  DATA lv_entityset_name TYPE string.
 
 lv_entityset_name = io_tech_request_context->get_entity_set_name( ).
@@ -257,6 +331,29 @@ CASE lv_entityset_name.
         cr_data = er_entity
    ).
 
+*-------------------------------------------------------------------------*
+*             EntitySet -  RequesterSet
+*-------------------------------------------------------------------------*
+     WHEN 'RequesterSet'.
+*     Call the entity set generated method
+    requesterset_create_entity(
+         EXPORTING iv_entity_name     = iv_entity_name
+                   iv_entity_set_name = iv_entity_set_name
+                   iv_source_name     = iv_source_name
+                   io_data_provider   = io_data_provider
+                   it_key_tab         = it_key_tab
+                   it_navigation_path = it_navigation_path
+                   io_tech_request_context = io_tech_request_context
+       	 IMPORTING er_entity          = requesterset_create_entity
+    ).
+*     Send specific entity data to the caller interfaces
+    copy_data_to_ref(
+      EXPORTING
+        is_data = requesterset_create_entity
+      CHANGING
+        cr_data = er_entity
+   ).
+
   when others.
     super->/iwbep/if_mgw_appl_srv_runtime~create_entity(
        EXPORTING
@@ -288,7 +385,7 @@ endmethod.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~DELETE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_DEL_ENTITY_BASE
-*&* This class has been generated on 12.06.2018 14:58:53 in client 001
+*&* This class has been generated on 13.06.2018 11:00:24 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -328,6 +425,20 @@ CASE lv_entityset_name.
                     io_tech_request_context = io_tech_request_context
      ).
 
+*-------------------------------------------------------------------------*
+*             EntitySet -  RequesterSet
+*-------------------------------------------------------------------------*
+      when 'RequesterSet'.
+*     Call the entity set generated method
+     requesterset_delete_entity(
+          EXPORTING iv_entity_name     = iv_entity_name
+                    iv_entity_set_name = iv_entity_set_name
+                    iv_source_name     = iv_source_name
+                    it_key_tab         = it_key_tab
+                    it_navigation_path = it_navigation_path
+                    io_tech_request_context = io_tech_request_context
+     ).
+
    when others.
      super->/iwbep/if_mgw_appl_srv_runtime~delete_entity(
         EXPORTING
@@ -358,7 +469,7 @@ endmethod.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITY.
 *&-----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_GETENTITY_BASE
-*&* This class has been generated  on 12.06.2018 14:58:53 in client 001
+*&* This class has been generated  on 13.06.2018 11:00:24 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -367,6 +478,7 @@ method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITY.
 
  DATA headerset_get_entity TYPE zcl_zenisb_mpc=>ts_header.
  DATA itemset_get_entity TYPE zcl_zenisb_mpc=>ts_item.
+ DATA requesterset_get_entity TYPE zcl_zenisb_mpc=>ts_requester.
  DATA lv_entityset_name TYPE string.
  DATA lr_entity TYPE REF TO data.
 
@@ -429,6 +541,34 @@ CASE lv_entityset_name.
 *         In case of initial values - unbind the entity reference
           er_entity = lr_entity.
         ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  RequesterSet
+*-------------------------------------------------------------------------*
+      WHEN 'RequesterSet'.
+*     Call the entity set generated method
+          requesterset_get_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = requesterset_get_entity
+                         es_response_context = es_response_context
+          ).
+
+        IF requesterset_get_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = requesterset_get_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
 
       WHEN OTHERS.
         super->/iwbep/if_mgw_appl_srv_runtime~get_entity(
@@ -467,7 +607,7 @@ endmethod.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITYSET.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TMP_ENTITYSET_BASE
-*&* This class has been generated on 12.06.2018 14:58:53 in client 001
+*&* This class has been generated on 13.06.2018 11:00:24 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -475,6 +615,7 @@ method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITYSET.
 *&-----------------------------------------------------------------------------------------------*
  DATA headerset_get_entityset TYPE zcl_zenisb_mpc=>tt_header.
  DATA itemset_get_entityset TYPE zcl_zenisb_mpc=>tt_item.
+ DATA requesterset_get_entityset TYPE zcl_zenisb_mpc=>tt_requester.
  DATA lv_entityset_name TYPE string.
 
 lv_entityset_name = io_tech_request_context->get_entity_set_name( ).
@@ -540,6 +681,36 @@ CASE lv_entityset_name.
           cr_data = er_entityset
       ).
 
+*-------------------------------------------------------------------------*
+*             EntitySet -  RequesterSet
+*-------------------------------------------------------------------------*
+   WHEN 'RequesterSet'.
+*     Call the entity set generated method
+      requesterset_get_entityset(
+        EXPORTING
+         iv_entity_name = iv_entity_name
+         iv_entity_set_name = iv_entity_set_name
+         iv_source_name = iv_source_name
+         it_filter_select_options = it_filter_select_options
+         it_order = it_order
+         is_paging = is_paging
+         it_navigation_path = it_navigation_path
+         it_key_tab = it_key_tab
+         iv_filter_string = iv_filter_string
+         iv_search_string = iv_search_string
+         io_tech_request_context = io_tech_request_context
+       IMPORTING
+         et_entityset = requesterset_get_entityset
+         es_response_context = es_response_context
+       ).
+*     Send specific entity data to the caller interface
+      copy_data_to_ref(
+        EXPORTING
+          is_data = requesterset_get_entityset
+        CHANGING
+          cr_data = er_entityset
+      ).
+
     WHEN OTHERS.
       super->/iwbep/if_mgw_appl_srv_runtime~get_entityset(
         EXPORTING
@@ -577,7 +748,7 @@ endmethod.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~UPDATE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_UPD_ENTITY_BASE
-*&* This class has been generated on 12.06.2018 14:58:53 in client 001
+*&* This class has been generated on 13.06.2018 11:00:24 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -586,6 +757,7 @@ method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~UPDATE_ENTITY.
 
  DATA headerset_update_entity TYPE zcl_zenisb_mpc=>ts_header.
  DATA itemset_update_entity TYPE zcl_zenisb_mpc=>ts_item.
+ DATA requesterset_update_entity TYPE zcl_zenisb_mpc=>ts_requester.
  DATA lv_entityset_name TYPE string.
  DATA lr_entity TYPE REF TO data.
 
@@ -639,6 +811,33 @@ CASE lv_entityset_name.
           copy_data_to_ref(
             EXPORTING
               is_data = itemset_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  RequesterSet
+*-------------------------------------------------------------------------*
+      WHEN 'RequesterSet'.
+*     Call the entity set generated method
+          requesterset_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = requesterset_update_entity
+          ).
+       IF requesterset_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = requesterset_update_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -1537,5 +1736,278 @@ method ITEMSET_UPDATE_ENTITY.
     EXPORTING
       textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
       method = 'ITEMSET_UPDATE_ENTITY'.
+endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZENISB_DPC->REQUESTERSET_CREATE_ENTITY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY_C(optional)
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [--->] IO_DATA_PROVIDER               TYPE REF TO /IWBEP/IF_MGW_ENTRY_PROVIDER(optional)
+* | [<---] ER_ENTITY                      TYPE        ZCL_ZENISB_MPC=>TS_REQUESTER
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+method REQUESTERSET_CREATE_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'REQUESTERSET_CREATE_ENTITY'.
+endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZENISB_DPC->REQUESTERSET_DELETE_ENTITY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY_D(optional)
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+method REQUESTERSET_DELETE_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'REQUESTERSET_DELETE_ENTITY'.
+endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZENISB_DPC->REQUESTERSET_GET_ENTITY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IO_REQUEST_OBJECT              TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY(optional)
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY(optional)
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [<---] ER_ENTITY                      TYPE        ZCL_ZENISB_MPC=>TS_REQUESTER
+* | [<---] ES_RESPONSE_CONTEXT            TYPE        /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+method REQUESTERSET_GET_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'REQUESTERSET_GET_ENTITY'.
+endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZENISB_DPC->REQUESTERSET_GET_ENTITYSET
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_FILTER_SELECT_OPTIONS       TYPE        /IWBEP/T_MGW_SELECT_OPTION
+* | [--->] IS_PAGING                      TYPE        /IWBEP/S_MGW_PAGING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [--->] IT_ORDER                       TYPE        /IWBEP/T_MGW_SORTING_ORDER
+* | [--->] IV_FILTER_STRING               TYPE        STRING
+* | [--->] IV_SEARCH_STRING               TYPE        STRING
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITYSET(optional)
+* | [<---] ET_ENTITYSET                   TYPE        ZCL_ZENISB_MPC=>TT_REQUESTER
+* | [<---] ES_RESPONSE_CONTEXT            TYPE        /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+method requesterset_get_entityset.
+
+  data: lx_root        type ref to cx_root,
+        lx_cnt         type ref to cx_swf_cnt_container,
+        lo_ret         type ref to /iwbep/if_message_container,
+        lt_hdr         type standard table of crmd_orderadm_h,
+        lt_u21         type standard table of usr21,
+        lt_adr         type standard table of adrp,
+        lt_sc          type zcl_zenisb_mpc=>tt_header,
+        lt_wi          type ibo_t_wf_facade_inbox_wi,
+        lt_task_filter type ibo_t_inbox_task_id,
+        lt_sort        type abap_sortorder_tab,
+        ls_u21         type usr21,
+        ls_adr         type adrp,
+        ls_set         type zcl_zenisb_mpc=>ts_requester,
+        ls_sc          type zcl_zenisb_mpc=>ts_header,
+        ls_order       type /iwbep/s_mgw_sorting_order,
+        ls_sort        type abap_sortorder,
+        ls_hdr         type crmd_orderadm_h,
+        ls_wi          type ibo_s_wf_facade_inbox_wi,
+        ls_key         type /iwbep/s_mgw_name_value_pair,
+        ##needed
+        lv_uni         type setst_type_any,
+        lv_search      type string,
+        lv_search_str  type string,
+        lv_osql        type string,
+        lv_task_filter type ibo_inbox_task_id.
+
+  field-symbols: <ls_set> type zcl_zenisb_mpc=>ts_requester.
+
+* to map return messages in header response (sap-message)
+  lo_ret = me->/iwbep/if_mgw_conv_srv_runtime~get_message_container( ).
+
+*  raise exception type /iwbep/cx_mgw_busi_exception
+*    exporting
+*      textid            = /iwbep/cx_mgw_busi_exception=>business_error
+*      message           = ''
+*      message_container = lo_ret.
+
+* build entity set
+************************************************************************************************
+
+  try.
+
+*     get workitem list
+      lv_task_filter = 'TS90000006'. append lv_task_filter to lt_task_filter.
+      cl_ibo_wf_inbox_facade=>get_workitem_list( exporting iv_user = sy-uname iv_passive_substitution = space it_task_filter = lt_task_filter importing et_work_item = lt_wi ).
+
+*     nothing -> exit
+      if lt_wi is initial. return. endif.
+
+    catch cx_static_check cx_dynamic_check into lx_root.
+
+      raise exception type /iwbep/cx_mgw_not_impl_exc
+        exporting
+          textid   = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+          previous = lx_root
+          method   = 'RQUESTERSET_GET_ENTITYSET'.
+
+  endtry.
+
+  loop at lt_wi into ls_wi.
+    try.
+*       prepare fields
+        clear: ls_sc.
+        ls_sc-workitemid = ls_wi-wi_id.
+*       get cart guid
+        cl_swf_run_wim_factory=>find_by_wiid( ls_wi-wi_id )->get_wi_container( )->if_swf_cnt_element_access_1~element_get_value( exporting name = 'BOID' importing value = ls_sc-basketguid unit = lv_uni exception_return = lx_cnt ).
+        if lx_cnt is bound or ls_sc-basketguid is initial. continue. endif.
+        append ls_sc to lt_sc.
+      catch cx_static_check cx_dynamic_check.
+        continue.
+    endtry.
+  endloop.
+
+* nothing -> exit
+  if lt_sc is initial. return. endif.
+
+  try.
+
+      select * from: crmd_orderadm_h into table lt_hdr for all entries in lt_sc where guid eq lt_sc-basketguid.
+      if not lt_hdr is initial. select * from usr21 into table lt_u21 for all entries in lt_hdr where bname eq lt_hdr-created_by. endif.
+      if not lt_u21 is initial. select * from adrp into table lt_adr for all entries in lt_u21 where persnumber eq lt_u21-persnumber and date_from eq '00010101' and nation eq ''. endif.
+
+      loop at lt_sc into ls_sc.
+        clear: ls_hdr, ls_u21, ls_adr.
+        read table lt_hdr into ls_hdr with key guid = ls_sc-basketguid.
+        if sy-subrc ne 0. continue. endif.
+        read table lt_u21 into ls_u21 with key bname = ls_hdr-created_by.
+        if sy-subrc ne 0. continue. endif.
+        read table lt_adr into ls_adr with key persnumber = ls_u21-persnumber date_from = '00010101' nation = ''.
+        if sy-subrc ne 0. continue. endif.
+        ls_set-userid = ls_hdr-created_by.
+        ls_set-username = ls_adr-name_text.
+        append ls_set to et_entityset.
+      endloop.
+
+      sort et_entityset by userid. delete adjacent duplicates from et_entityset comparing userid.
+
+    catch cx_static_check cx_dynamic_check into lx_root.
+
+      raise exception type /iwbep/cx_mgw_not_impl_exc
+        exporting
+          textid   = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+          previous = lx_root
+          method   = 'REQUESTERSET_GET_ENTITYSET'.
+
+  endtry.
+
+  try.
+
+*     filter 4 keytab (if provided)
+************************************************************************************************
+      if not it_key_tab is initial.
+        loop at it_key_tab into ls_key.
+          translate ls_key-name to upper case.
+          if sy-tabix eq 1. lv_osql = |{ ls_key-name } EQ '{ ls_key-value }'|. else. lv_osql = |{ lv_osql } AND { ls_key-name } EQ '{ ls_key-value }'|. endif.
+        endloop.
+        lv_osql = |NOT ( { lv_osql } )|.  delete et_entityset where (lv_osql).
+      endif.
+
+*     filter with open sql (instead of using it_filter_select_options or iv_filter_string)
+************************************************************************************************
+      clear lv_osql. lv_osql = io_tech_request_context->get_osql_where_clause( ).
+      if not lv_osql is initial.
+        translate lv_osql: to upper case, using '_+', using '%*'. replace all occurrences of 'LIKE' in lv_osql with 'CP'. lv_osql = |NOT { lv_osql }|.
+        delete et_entityset where (lv_osql).
+      endif.
+
+*     sorting
+************************************************************************************************
+      if not it_order is initial.
+        loop at it_order into ls_order.
+          translate: ls_order-order to upper case, ls_order-property to upper case.
+          ls_sort-name = ls_order-property.
+          if ls_order-order eq 'DESC'. ls_sort-descending = abap_true. endif.
+          append ls_sort to lt_sort.
+        endloop.
+        sort et_entityset by (lt_sort).
+      else.
+        sort et_entityset by userid descending.
+      endif.
+
+*     search string
+************************************************************************************************
+      if not iv_search_string is initial.
+*       not supported in odata v2
+      endif.
+
+*     paging (last thing to do)
+************************************************************************************************
+      if not is_paging-skip is initial. delete et_entityset to is_paging-skip. endif.
+      if not is_paging-top is initial. delete et_entityset from is_paging-top + 1. endif.
+
+    catch cx_static_check cx_dynamic_check into lx_root.
+
+      raise exception type /iwbep/cx_mgw_not_impl_exc
+        exporting
+          textid   = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+          previous = lx_root
+          method   = 'REQUESTERSET_GET_ENTITYSET'.
+
+  endtry.
+
+endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZENISB_DPC->REQUESTERSET_UPDATE_ENTITY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY_U(optional)
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [--->] IO_DATA_PROVIDER               TYPE REF TO /IWBEP/IF_MGW_ENTRY_PROVIDER(optional)
+* | [<---] ER_ENTITY                      TYPE        ZCL_ZENISB_MPC=>TS_REQUESTER
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+method REQUESTERSET_UPDATE_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'REQUESTERSET_UPDATE_ENTITY'.
 endmethod.
 ENDCLASS.

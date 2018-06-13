@@ -44,12 +44,14 @@ sap.ui.define(["sap/ui/core/mvc/Controller",
 				// get parameters and initialize sorter
 				var parameters = oEvent.getParameters();
 				var aSorter = [];
+				var aFilters = [];
 				// grouping
 			    if (parameters.groupItem) {
 			    	switch (parameters.groupItem.getKey()) {
 			    		case "1": aSorter.push(new sap.ui.model.Sorter("CreatedBy",parameters.groupDescending,true)); break;
 			    	}	 
 			    }
+			    // sorting
 			    if (parameters.sortItem) {
 			    	switch (parameters.sortItem.getKey()) {
 			    		case "1": aSorter.push(new sap.ui.model.Sorter("BasketNumber",parameters.groupDescending,false)); break;
@@ -57,8 +59,20 @@ sap.ui.define(["sap/ui/core/mvc/Controller",
 			    		default: break;
 			    	}
 			    }
-			    if (aSorter.length > 0) 
-			    	{ this.byId("masterList").getBinding("items").sort(aSorter); this.byId("butFilter").setIcon("sap-icon://add-filter"); }
+			    // filtering			    
+			    for (var i=0;i<parameters.filterItems.length;i++) {
+				      var aSplit = parameters.filterItems[i].getKey().split("__");
+				      var oFilter = new sap.ui.model.Filter(aSplit[0],FilterOperator.EQ,aSplit[1]);
+				      aFilters.push(oFilter);
+				    }
+			    
+			    // apply
+			    if (parameters.filterItems.length>0) { this.byId("masterList").getBinding("items").filter(aFilters); }
+			    if (aSorter.length>0) { this.byId("masterList").getBinding("items").sort(aSorter); }
+			    
+			    // handle icon
+			    if ((aSorter.length>0) || (parameters.filterItems.length>0))
+			    	{ this.byId("butFilter").setIcon("sap-icon://add-filter"); }
 			    else
 			    	{ this.byId("butFilter").setIcon("sap-icon://filter"); }
 			}

@@ -1,5 +1,12 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-	<ViewSettingsDialog title="Filters" confirm="onConfirm">
+	<ViewSettingsDialog title="Filters" confirm="onConfirm">                 	
+        <filterItems>
+            <ViewSettingsFilterItem text="Requester" key="CreatedBy" multiselect="true" items="{path:'sc>/RequesterSet',sorter:[{path:'UserID',descending:false}]}">
+            	<items>
+            		<ViewSettingsItem text="{sc>Username}" key="CreatedBy__{sc>UserID}" />
+            	</items>
+            </ViewSettingsFilterItem>
+        </filterItems>	
 		<sortItems>
 			<ViewSettingsItem text="BasketNumber" key="1" />
 			<ViewSettingsItem text="Requester" key="2" />
