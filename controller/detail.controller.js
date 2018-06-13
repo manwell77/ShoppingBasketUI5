@@ -40,7 +40,7 @@ sap.ui.define(["sap/ui/core/mvc/Controller",
 			
 			_onObjectMatched: function (oEvent) {
 				/* match path */						
-				var sPath = "/HeaderSet('" + oEvent.getParameter("arguments").WorkitemID + "')";
+				var sPath = "/HeaderSet('" + oEvent.getParameter("arguments").WorkitemID + "')?$expand=RequesterSet";
 				var oView = this.getView();
 				oView.bindElement( { path: sPath, model: "sc", events: { change: this._onBindingChange.bind(this), dataRequested: function(oEvent) { oView.setBusy(true); }, dataReceived: function(oEvent) { oView.setBusy(false); } } } );					
 				this.getView().byId("detailPage").setVisible(true);		

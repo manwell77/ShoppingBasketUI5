@@ -9,15 +9,15 @@ public section.
   interfaces /IWBEP/IF_SB_DPC_COMM_SERVICES .
   interfaces /IWBEP/IF_SB_GEN_DPC_INJECTION .
 
-  methods /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITYSET
-    redefinition .
-  methods /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITY
-    redefinition .
-  methods /IWBEP/IF_MGW_APPL_SRV_RUNTIME~UPDATE_ENTITY
-    redefinition .
   methods /IWBEP/IF_MGW_APPL_SRV_RUNTIME~CREATE_ENTITY
     redefinition .
   methods /IWBEP/IF_MGW_APPL_SRV_RUNTIME~DELETE_ENTITY
+    redefinition .
+  methods /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITY
+    redefinition .
+  methods /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITYSET
+    redefinition .
+  methods /IWBEP/IF_MGW_APPL_SRV_RUNTIME~UPDATE_ENTITY
     redefinition .
 protected section.
 
@@ -270,7 +270,7 @@ CLASS ZCL_ZENISB_DPC IMPLEMENTATION.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~CREATE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_CRT_ENTITY_BASE
-*&* This class has been generated on 13.06.2018 11:00:24 in client 001
+*&* This class has been generated on 13.06.2018 13:46:10 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -385,7 +385,7 @@ endmethod.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~DELETE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_DEL_ENTITY_BASE
-*&* This class has been generated on 13.06.2018 11:00:24 in client 001
+*&* This class has been generated on 13.06.2018 13:46:10 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -469,7 +469,7 @@ endmethod.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITY.
 *&-----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_GETENTITY_BASE
-*&* This class has been generated  on 13.06.2018 11:00:24 in client 001
+*&* This class has been generated  on 13.06.2018 13:46:10 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -607,7 +607,7 @@ endmethod.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITYSET.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TMP_ENTITYSET_BASE
-*&* This class has been generated on 13.06.2018 11:00:24 in client 001
+*&* This class has been generated on 13.06.2018 13:46:10 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -748,7 +748,7 @@ endmethod.
 method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~UPDATE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_UPD_ENTITY_BASE
-*&* This class has been generated on 13.06.2018 11:00:24 in client 001
+*&* This class has been generated on 13.06.2018 13:46:10 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -1796,11 +1796,56 @@ endmethod.
 * | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
 * | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
 * +--------------------------------------------------------------------------------------</SIGNATURE>
-method REQUESTERSET_GET_ENTITY.
-  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
-    EXPORTING
-      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
-      method = 'REQUESTERSET_GET_ENTITY'.
+method requesterset_get_entity.
+
+  data: lx_root        type ref to cx_root,
+        lo_ret         type ref to /iwbep/if_message_container,
+        lt_ret         type bapiret2_t,
+        ls_key         type /iwbep/s_mgw_name_value_pair,
+        ls_adr         type bapiaddr3,
+        lv_uname       type xubname.
+
+* to map return messages in header response (sap-message)
+  lo_ret = me->/iwbep/if_mgw_conv_srv_runtime~get_message_container( ).
+
+*  raise exception type /iwbep/cx_mgw_busi_exception
+*    exporting
+*      textid            = /iwbep/cx_mgw_busi_exception=>business_error
+*      message           = ''
+*      message_container = lo_ret.
+
+* build entity set
+************************************************************************************************
+
+  try.
+
+*     get key (must be provided)
+      if it_key_tab is initial. return. else. read table it_key_tab into ls_key index 1. if sy-subrc ne 0 or ls_key-value is initial. return. else. lv_uname = ls_key-value. endif. endif.
+
+*     get user detail
+      call function 'BAPI_USER_GET_DETAIL'
+        exporting
+          username = lv_uname
+        importing
+          address  = ls_adr
+        tables
+          return   = lt_ret.
+
+      if ls_adr is initial. return. endif.
+
+      er_entity-userid = ls_key-value.
+      er_entity-username = ls_adr-fullname.
+
+    catch cx_static_check cx_dynamic_check into lx_root.
+
+      raise exception type /iwbep/cx_mgw_not_impl_exc
+        exporting
+          textid   = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+          previous = lx_root
+          method   = 'REQUESTERSET_GET_ENTITYSET'.
+
+  endtry.
+
 endmethod.
 
 

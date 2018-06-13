@@ -14,7 +14,7 @@
 		   <List id="masterList" 
 			     class="sapUiResponsiveMargin"
 			     width="auto"
-			     items="{path:'sc>/HeaderSet'}"
+			     items="{path:'sc>/HeaderSet',parameters:{expand:'RequesterSet'}}"
 				 growing="true"
 				 growingThreshold="10"
 				 growingScrollToLoad="true"
@@ -28,7 +28,7 @@
 						<ObjectStatus text="{sc>Status}" />
 					</firstStatus>		                         
        				<attributes>
-						<ObjectAttribute text="{sc>CreatedBy}" />											
+						<ObjectAttribute text="{sc>RequesterSet/Username}" />											
 					</attributes>		                         
 		         </ObjectListItem>
 		      </items>

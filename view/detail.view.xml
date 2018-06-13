@@ -12,7 +12,7 @@
 					      binding="{sc}"        	  
 						  title="{sc>BasketNumber}"
 						  icon="sap-icon://my-sales-order"
-						  intro="{sc>CreatedBy}"
+						  intro="{sc>RequesterSet/Username}"
 						  showMarkers="false"
 						  markFlagged="false"
 						  markFavorite="false"
