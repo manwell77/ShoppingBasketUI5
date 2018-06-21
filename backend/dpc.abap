@@ -1374,6 +1374,7 @@ method headerset_update_entity.
         ls_msg    type bbp_pds_messages,
         lv_wiid   type sww_wiid,
         lv_key    type text255,
+        lv_msg    type bapi_msg,
         lv_mode   type /sapsrm/pdo_inst_mode,
         ##needed
         lv_uni    type setst_type_any.
@@ -1386,16 +1387,10 @@ method headerset_update_entity.
         ls_cv    type swaconextv,
         ls_cs    type swaconextv.
 
-* to map return messages in header response (sap-message)
-  lo_ret = me->/iwbep/if_mgw_conv_srv_runtime~get_message_container( ).
-
-*  raise exception type /iwbep/cx_mgw_busi_exception
-*    exporting
-*      textid            = /iwbep/cx_mgw_busi_exception=>business_error
-*      message           = ''
-*      message_container = lo_ret.
-
   try.
+
+*     to map return messages in header response (sap-message)
+      lo_ret = me->/iwbep/if_mgw_conv_srv_runtime~get_message_container( ).
 
 *     get http data
       io_data_provider->read_entry_data( importing es_data = ls_basket ). lv_wiid = ls_basket-workitemid.
@@ -1418,13 +1413,7 @@ method headerset_update_entity.
 *     result -> if error exit without closing workitem
       if lo_msg is bound.
         lo_msg->get_messages( importing et_messages = lt_msg ).
-        loop at lt_msg into ls_msg where msgty ca 'EA'.
-          raise exception type /iwbep/cx_mgw_not_impl_exc
-            exporting
-              textid   = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
-              previous = lx_root
-              method   = 'HEADERSET_UPDATE_ENTITY'.
-        endloop.
+        loop at lt_msg into ls_msg where msgty ca 'EA'. lo_ret->add_message_text_only( iv_msg_type = 'E' iv_msg_text = ls_msg-message iv_add_to_response_header = abap_true ). endloop.
       endif.
 
 *     prepare event container
@@ -1436,11 +1425,18 @@ method headerset_update_entity.
 
     catch cx_static_check cx_dynamic_check into lx_root.
 
-      raise exception type /iwbep/cx_mgw_not_impl_exc
+*     result -> if error exit without closing workitem
+      if lo_msg is bound.
+        lo_msg->get_messages( importing et_messages = lt_msg ).
+        loop at lt_msg into ls_msg where msgty ca 'EA'. lo_ret->add_message_text_only( iv_msg_type = 'E' iv_msg_text = ls_msg-message iv_add_to_response_header = abap_true ). endloop.
+      else.
+        lv_msg = lx_root->get_text( ).
+        lo_ret->add_message_text_only( iv_msg_type = 'E' iv_msg_text = lv_msg iv_add_to_response_header = abap_true ).
+      endif.
+
+      raise exception type /iwbep/cx_mgw_busi_exception
         exporting
-          textid   = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
-          previous = lx_root
-          method   = 'HEADERSET_UPDATE_ENTITY'.
+          message_container = lo_ret.
 
   endtry.
 

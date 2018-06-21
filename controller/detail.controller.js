@@ -78,7 +78,11 @@ sap.ui.define(["sap/ui/core/mvc/Controller",
 				oModel.update(sPath,oEntry, 
 					{ context:null,
 					  success: function(oData, oResponse) { MessageToast.show("Approved"); self.getView().getModel("sc").refresh(); },
-					  error: function(oError) { MessageToast.show("Error Occurred"); 	}
+					  error: function(oError) { 
+						  var errorList = jQuery.parseJSON(oError.responseText).error.innererror.errordetails;
+						  var message = "";
+						  for (var j=0;j<errorList.length;j++) { message += errorList[j].message; }
+						  MessageToast.show(message); }
 					} );			
 			},
 			
@@ -97,7 +101,11 @@ sap.ui.define(["sap/ui/core/mvc/Controller",
 				oModel.update(sPath,oEntry, 
 						{ context:null,
 					      success: function(oData, oResponse) { MessageToast.show("Rejected"); self.getView().getModel("sc").refresh(); },
-						  error: function(oError) {	MessageToast.show("Error Occurred"); }
+						  error: function(oError) { 
+							  var errorList = jQuery.parseJSON(oError.responseText).error.innererror.errordetails;
+							  var message = "";
+							  for (var j=0;j<errorList.length;j++) { message += errorList[j].message; }
+							  MessageToast.show(message); }
 						} );		
 			}
 			
